@@ -242,7 +242,7 @@ project-root/
 
 ## Implementation Phases
 
-### Phase 1 — Skeleton & Server ✅ / 🔲
+### Phase 1 — Skeleton & Server ✅ COMPLETE
 **Objective:** Running locally end-to-end, no LLM calls yet.
 - `package.json`, `server.js` with Express static serving
 - `.env` + `.gitignore`
@@ -324,4 +324,78 @@ Do not build:
 | Date | Phase | Notes |
 |---|---|---|
 | 2026-03-23 | Planning | Full plan drafted, all clarifications resolved |
-| 2026-03-23 | Phase 1 | Starting now |
+| 2026-03-23 | Phase 1 | Started implementation |
+| 2026-03-24 | Phase 1 | Completed — merged PR #1 to main |
+
+---
+
+## Phase 1 Completion Summary
+
+**Branch:** `phase-1-skeleton`
+**PR:** #1 — merged to `main` on 2026-03-24
+**Commits:** 2 (skeleton + README)
+
+### What was built
+
+#### Backend (`server.js`)
+- Node.js + Express server serving the `public/` directory as static files
+- `/api/user-context` endpoint that reads Windows environment variables (`USERNAME`, `USERDNSDOMAIN`, `COMPUTERNAME`) and returns them as JSON to pre-fill the intake form
+- Stub routes for all four Phase 3 LLM endpoints (`/api/classify`, `/api/questions`, `/api/reflect`, `/api/generate-ticket`) returning HTTP 501 until wired in Phase 3
+- API key loaded from `.env` via `dotenv` — never exposed to the browser
+- Startup console output confirming env var detection and API key presence
+
+#### Frontend shell (`public/index.html`)
+- Single-page application shell containing all 7 step containers:
+  - Step 0: Identity form (pre-filled, editable)
+  - Step 1: Issue description + urgency selector
+  - Step 2: Classification result display
+  - Step 3: Follow-up questions
+  - Step 4: Reflection and confirmation
+  - Step 5: Ticket generating (loading state)
+  - Step 6: Done / confirmation card
+  - Graceful exit state (max rounds reached)
+- Only the active step is shown at any time via CSS class toggling
+
+#### Design system (`public/css/`)
+- `main.css`: Full design token system using CSS custom properties — colors, typography scale, spacing scale, border radii, shadows, transitions. Base styles for cards, form elements, buttons (primary, secondary, ghost, danger), step indicators, loading spinners, and utility classes.
+- `intake.css`: Styles specific to the intake flow — urgency radio card selector with four labeled levels, category badge display, priority comparison blocks, follow-up question list, reflection summary card, graceful exit state, and confirmation card.
+- `output.css`: Styles for the two output tabs — structured ticket document layout with header band, field grid sections, Q&A transcript display, and a dark-mode JSON payload view with syntax highlight color tokens.
+
+#### JavaScript (`public/js/`)
+- `app.js`: Central state machine. Owns all application state. Handles identity pre-fill on load, wires all form submit and button click events, and calls the appropriate step runner (classify, follow-up, reflect, generate) in sequence. Enforces the MAX_ROUNDS = 3 limit. Writes the final ticket to `localStorage` for output tabs to read.
+- `api.js`: All `fetch()` calls to the backend in one place. Each function is named for its intent (`fetchUserContext`, `classifyIssue`, `fetchQuestions`, `fetchReflection`, `generateTicket`). Ready to be wired to real responses in Phase 3.
+- `ui.js`: Pure DOM rendering functions — `showStep`, `renderClassification`, `renderQuestions`, `collectAnswers`, `renderReflection`, `resetLoadingState`, `showError`. No state, no side effects.
+- `pdf.js`: Full jsPDF implementation generating a letter-format PDF summary card. Includes blue header band, labeled field sections (requester, issue, priority, description, routing), footer with page numbers, and optional Q&A transcript appendix. Chosen because it runs entirely in the browser with no server involvement.
+- `ticket.js`: Reads ticket JSON from `localStorage` and renders a formatted service desk form in `ticket.html`. Includes all ticket fields, priority pill badges, and the full Q&A transcript.
+- `payload.js`: Reads ticket JSON from `localStorage` and renders pretty-printed, syntax-highlighted JSON in `payload.html`. Includes a one-click copy-to-clipboard button.
+
+#### LLM prompt templates (`prompts/`)
+- `classify.js`: System + user prompt for issue classification. Constrains output to the 6 canonical category keys. Requires JSON response with category, subcategory, llmPriority, and priorityRationale fields.
+- `questions.js`: System + user prompt for follow-up question generation. Includes per-category question hint banks. Enforces 3–5 question limit. Passes prior answers to avoid repeating covered ground.
+- `reflect.js`: System + user prompt for generating the plain-language reflection summary. Enforces second-person, 2–4 sentence format starting with "It sounds like you need help with..."
+- `generate-ticket.js`: System + user prompt for final ticket generation. Includes the full controlled output schema, routing team defaults per category, and all collected intake data.
+
+#### Documentation
+- `README.md`: Full setup guide for collaborators and instructors — prerequisites, step-by-step clone/install/run instructions, `.env` configuration, port conflict resolution, project structure overview, and API key security explanation.
+- `PLAN.md`: This file — full architecture documentation, data model, output schema, file structure, and phase-by-phase roadmap.
+
+### Key design decisions made in this phase
+
+| Decision | Rationale |
+|---|---|
+| Node/Express backend instead of browser-only | Required to keep OpenAI API key off the client |
+| Vanilla JS, no framework | Keeps code readable and explainable for a class project |
+| All state in a single `state` object in `app.js` | Simple to understand, no external state library needed |
+| `localStorage` for inter-tab communication | Simple, no server round-trip, works for a single-session prototype |
+| jsPDF via CDN | Zero install, runs in browser, well-documented |
+| CSS custom properties for design tokens | Easy to read and modify, no preprocessor needed |
+| Prompt templates in separate `prompts/` files | Clean separation, easy to iterate on prompts independently |
+
+### Verified working
+- `npm install` installs all dependencies cleanly (0 vulnerabilities)
+- Server starts and reads `USERNAME` and `COMPUTERNAME` from environment
+- `/api/user-context` returns correct JSON
+- App loads at `http://localhost:3000`
+- Identity fields pre-fill from system environment
+- Step 0 → Step 1 navigation works with form validation
+- `.env` and `node_modules/` correctly excluded from git
