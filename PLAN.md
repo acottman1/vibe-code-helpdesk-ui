@@ -385,6 +385,8 @@ Do not build:
 | 2026-03-23 | Planning | Full plan drafted, all clarifications resolved |
 | 2026-03-23 | Phase 1 | Started implementation |
 | 2026-03-24 | Phase 1 | Completed — merged PR #1 to main |
+| 2026-03-24 | Phase 2 | Started implementation |
+| 2026-03-24 | Phase 2 | Completed — merged PR #2 to main |
 
 ---
 
@@ -458,3 +460,59 @@ Do not build:
 - Identity fields pre-fill from system environment
 - Step 0 → Step 1 navigation works with form validation
 - `.env` and `node_modules/` correctly excluded from git
+
+---
+
+## Phase 2 Completion Summary
+
+**Branch:** `phase-2-intake-flow`
+**PR:** #2 — merged to `main` on 2026-03-24
+**Commits:** 3 (flow implementation + design pattern docs + progress log)
+
+### What was built
+
+#### `public/js/mock.js` (new file)
+The complete mock layer that enables the full intake flow to run without any API calls or OpenAI key.
+
+- **Keyword-aware classification:** Scores each of the 6 categories against the user's description using keyword matching. The category with the most keyword hits wins, defaulting to `device_workstation` if nothing matches. This means the mock responds to what the user actually typed — typing "internet" routes to Network & Connectivity, typing "email" routes to Email & Collaboration.
+- **Per-category question banks:** Two rounds of questions for all 6 categories. Round 1 has 4 questions, round 2 has 3 targeted follow-up questions. Each set is distinct — round 2 questions go deeper rather than repeating round 1.
+- **Personalized reflection builder:** Pulls the first substantive answer the user provided and weaves it into the summary string, making the reflection feel responsive rather than canned.
+- **Full ticket generator:** Builds a complete ticket object matching the controlled output schema entirely from real intake state — uses the user's actual name, email, device, description, answers, category, and priority. Generates a realistic `INC-XXXXXX` ticket ID and ISO 8601 timestamp.
+- **`mockDelay()`:** A configurable promise-based delay (default 900ms, 1200ms for ticket generation) applied to every mock call so loading spinners and transitions behave identically to real API calls during a demo.
+
+#### `public/js/app.js` (updated)
+- Added `USE_MOCKS = true` constant at the top with a clear `// Phase 3: flip to false` comment
+- Imported `mockDelay`, `mockClassify`, `mockQuestions`, `mockReflect`, `mockGenerateTicket` from `mock.js`
+- All four step runners (`runClassification`, `runFollowUp`, `runReflection`, `runGenerateTicket`) now branch on `USE_MOCKS` — mock path and live path are side by side, making the Phase 3 transition a one-line change
+- Added `clearErrors()` calls on every step transition to prevent validation messages from persisting across steps
+
+#### `public/js/ui.js` (updated)
+- Added `clearErrors()` export — removes all `.inline-error` elements from the DOM, called by `app.js` on every navigation action
+
+### Key design decisions made in this phase
+
+| Decision | Rationale |
+|---|---|
+| `USE_MOCKS` single flag | One-line toggle between mock and live mode; no restructuring required for Phase 3 |
+| Keyword scoring in mock classifier | Makes the demo respond to real input rather than always showing the same category |
+| `mockDelay()` on all mock calls | Loading states are visible and transitions feel identical to live API behavior |
+| Mock ticket built from real state | Output artifacts contain the user's actual data, not placeholder text — demo looks production-quality |
+| `clearErrors()` on step transitions | Prevents stale validation messages from appearing on unrelated steps |
+
+### Two-layer question bank — detailed explanation
+
+This is one of the more architecturally interesting decisions in the project and is worth understanding clearly. See the **Design Patterns & Technical Decisions** section above for the full breakdown.
+
+In short: `mock.js` contains questions that ARE shown to the user in Phase 2. `prompts/questions.js` contains hints that are passed to the LLM in Phase 3 — they guide what the model generates but are never shown directly. Phase 3 questions are dynamic (responding to prior answers), Phase 2 questions are static. The interface contract between the two is identical: both return `{ questions: string[] }`.
+
+### Verified working (full end-to-end flow)
+- Step 0 → identity pre-fills, validates name and email before advancing
+- Step 1 → description textarea and urgency radio cards work, both fields required
+- Step 2 → classification spinner shows ~900ms, category badge and dual priority blocks render
+- Step 3 → 4 follow-up questions render with numbered labels and text inputs
+- Step 4 → reflection summary incorporates the user's first answer; round counter shows correctly
+- "Not quite" path → increments round, shows different question set, tracks toward max
+- Max rounds path → graceful exit step renders with restart button
+- Confirm path → generating spinner shows ~1200ms, done card renders with ticket ID
+- Done screen → ticket tab opens with full structured view, payload tab opens with highlighted JSON, PDF downloads
+- Start over → state resets completely, identity form re-shows with pre-filled values intact
