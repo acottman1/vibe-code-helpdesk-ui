@@ -1,0 +1,354 @@
+/* ==========================================================================
+   intake.css — Styles specific to the intake flow steps
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Step visibility — only the active step is shown
+   -------------------------------------------------------------------------- */
+.step {
+  display: none;
+}
+
+.step.is-active {
+  display: block;
+  animation: stepIn 0.2s ease;
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Urgency selector — radio cards
+   -------------------------------------------------------------------------- */
+.urgency-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 520px) {
+  .urgency-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.urgency-option {
+  position: relative;
+}
+
+.urgency-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.urgency-option__label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  height: 100%;
+}
+
+.urgency-option input:checked + .urgency-option__label {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+.urgency-option__label:hover {
+  border-color: var(--color-gray-300);
+  background-color: var(--color-gray-50);
+}
+
+.urgency-option input:checked + .urgency-option__label:hover {
+  background-color: var(--color-primary-light);
+}
+
+.urgency-option__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  width: fit-content;
+}
+
+.urgency-option__badge--low {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.urgency-option__badge--medium {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.urgency-option__badge--high {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.urgency-option__badge--critical {
+  background-color: #fce7f3;
+  color: #9d174d;
+}
+
+.urgency-option__title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.urgency-option__desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* --------------------------------------------------------------------------
+   Classification result card
+   -------------------------------------------------------------------------- */
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.category-badge__icon {
+  font-size: var(--text-base);
+}
+
+.priority-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.priority-block {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-subtle);
+}
+
+.priority-block__label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.priority-block__value {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+
+.priority-block__rationale {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  line-height: var(--leading-relaxed);
+}
+
+/* Priority value colors */
+.priority--low      { color: var(--color-gray-600); }
+.priority--medium   { color: var(--color-warning); }
+.priority--high     { color: var(--color-danger); }
+.priority--critical { color: #be185d; }
+
+/* --------------------------------------------------------------------------
+   Follow-up questions
+   -------------------------------------------------------------------------- */
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.question-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.question-item__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+}
+
+.question-item__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+  margin-right: var(--space-2);
+}
+
+.round-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Reflection summary card
+   -------------------------------------------------------------------------- */
+.reflection-card {
+  background-color: var(--color-primary-light);
+  border: 1.5px solid rgb(37 99 235 / 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.reflection-card__heading {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reflection-card__body {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+}
+
+/* --------------------------------------------------------------------------
+   Graceful exit state
+   -------------------------------------------------------------------------- */
+.exit-card {
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+}
+
+.exit-card__icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-4);
+}
+
+.exit-card__title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.exit-card__message {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  max-width: 380px;
+  margin: 0 auto var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   Confirmation state (step 5 done state)
+   -------------------------------------------------------------------------- */
+.confirmation-card {
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+}
+
+.confirmation-card__icon {
+  width: 56px;
+  height: 56px;
+  background-color: var(--color-success-light);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-4);
+  font-size: 1.75rem;
+}
+
+.confirmation-card__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.confirmation-card__subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.confirmation-card__email-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.confirmation-card__ticket-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Help Desk — Request Intake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/intake.css" />
+</head>
+<body>
+
+  <!-- ======================================================
+       App Header
+  ======================================================= -->
+  <header class="app-header">
+    <div class="app-header__logo" aria-hidden="true">
+      <!-- Headset / support icon -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/>
+        <path d="M3 12h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H3v-6z"/>
+        <path d="M21 12h-1a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1v-6z"/>
+      </svg>
+    </div>
+    <span class="app-header__title">IT Help Desk</span>
+    <span class="app-header__subtitle" id="header-username"></span>
+  </header>
+
+  <!-- ======================================================
+       Main content — all steps render here
+  ======================================================= -->
+  <main class="app-main" id="app-main">
+
+    <!-- ──────────────────────────────────────────────
+         STEP 0: Identity
+    ─────────────────────────────────────────────── -->
+    <div class="step is-active" id="step-identity" data-step="identity">
+      <div class="card">
+        <div class="card__header">
+          <p class="card__eyebrow">Step 1 of 4</p>
+          <h1 class="card__title">Let's start with your information</h1>
+          <p class="card__description">
+            We've pre-filled your details from your system account. Please confirm or correct them before continuing.
+          </p>
+        </div>
+
+        <form id="form-identity" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="input-name">
+                Your name <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="input-name"
+                name="name"
+                placeholder="First Last"
+                autocomplete="name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="input-email">
+                Work email <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                class="form-input"
+                type="email"
+                id="input-email"
+                name="email"
+                placeholder="you@company.com"
+                autocomplete="email"
+                required
+              />
+              <p class="form-hint" id="email-hint"></p>
+            </div>
+          </div>
+
+          <div class="form-row mt-4">
+            <div class="form-group">
+              <label class="form-label" for="input-device">
+                Device / computer name
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="input-device"
+                name="device"
+                placeholder="e.g. DESKTOP-A1B2C3"
+              />
+              <p class="form-hint">Your computer name, if known. Used for routing.</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="input-location">
+                Your location
+              </label>
+              <input
+                class="form-input"
+                type="text"
+                id="input-location"
+                name="location"
+                placeholder="e.g. Main office, Home office"
+              />
+            </div>
+          </div>
+
+          <div class="btn-group btn-group--end">
+            <button type="submit" class="btn btn--primary btn--lg" id="btn-identity-next">
+              Continue
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 1: Issue Entry
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-issue" data-step="issue">
+      <div class="card">
+        <div class="card__header">
+          <p class="card__eyebrow">Step 2 of 4</p>
+          <h1 class="card__title">What's going on?</h1>
+          <p class="card__description">
+            Describe your issue in plain language — no technical jargon needed. We'll help turn it into a proper support ticket.
+          </p>
+        </div>
+
+        <form id="form-issue" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="input-description">
+              Describe your issue <span class="required" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              class="form-textarea"
+              id="input-description"
+              name="description"
+              rows="4"
+              placeholder="For example: I can't log into my email, my laptop won't connect to the internet, I keep getting an error when I open a file..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group mt-6">
+            <label class="form-label" id="urgency-label">
+              How urgent is this? <span class="required" aria-hidden="true">*</span>
+            </label>
+            <div class="urgency-grid" role="radiogroup" aria-labelledby="urgency-label">
+
+              <div class="urgency-option">
+                <input type="radio" name="urgency" id="urgency-low" value="Low" />
+                <label class="urgency-option__label" for="urgency-low">
+                  <span class="urgency-option__badge urgency-option__badge--low">Low</span>
+                  <span class="urgency-option__title">Annoying, but manageable</span>
+                  <span class="urgency-option__desc">I can work around it for now</span>
+                </label>
+              </div>
+
+              <div class="urgency-option">
+                <input type="radio" name="urgency" id="urgency-medium" value="Medium" />
+                <label class="urgency-option__label" for="urgency-medium">
+                  <span class="urgency-option__badge urgency-option__badge--medium">Medium</span>
+                  <span class="urgency-option__title">Partially blocked</span>
+                  <span class="urgency-option__desc">I can't do what I want, but I can do other things</span>
+                </label>
+              </div>
+
+              <div class="urgency-option">
+                <input type="radio" name="urgency" id="urgency-high" value="High" />
+                <label class="urgency-option__label" for="urgency-high">
+                  <span class="urgency-option__badge urgency-option__badge--high">High</span>
+                  <span class="urgency-option__title">Fully blocked</span>
+                  <span class="urgency-option__desc">I'm prevented from doing any of my work</span>
+                </label>
+              </div>
+
+              <div class="urgency-option">
+                <input type="radio" name="urgency" id="urgency-critical" value="Critical" />
+                <label class="urgency-option__label" for="urgency-critical">
+                  <span class="urgency-option__badge urgency-option__badge--critical">Critical</span>
+                  <span class="urgency-option__title">Fully blocked + time-sensitive</span>
+                  <span class="urgency-option__desc">I'm blocked and it must be resolved immediately</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="btn-group btn-group--between">
+            <button type="button" class="btn btn--secondary" id="btn-issue-back">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back
+            </button>
+            <button type="submit" class="btn btn--primary btn--lg" id="btn-issue-next">
+              Analyze my issue
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 2: Classification result
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-classify" data-step="classify">
+      <div class="card">
+        <div class="card__header">
+          <p class="card__eyebrow">Step 3 of 4</p>
+          <h1 class="card__title">Here's what we found</h1>
+          <p class="card__description">
+            Based on your description, we've categorized your issue and assessed the urgency. Please confirm this looks right before we continue.
+          </p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="classify-loading" class="loading-message">
+          <div class="spinner"></div>
+          <span>Analyzing your issue…</span>
+        </div>
+
+        <!-- Result (hidden until loaded) -->
+        <div id="classify-result" class="hidden">
+          <div class="form-group">
+            <p class="form-label">Detected category</p>
+            <div id="category-display"></div>
+          </div>
+
+          <div class="mt-4">
+            <p class="form-label">Priority assessment</p>
+            <div class="priority-comparison" id="priority-comparison"></div>
+          </div>
+
+          <div class="btn-group btn-group--between mt-6">
+            <button type="button" class="btn btn--secondary" id="btn-classify-back">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back
+            </button>
+            <button type="button" class="btn btn--primary btn--lg" id="btn-classify-confirm">
+              Looks right — continue
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 3: Follow-up questions
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-followup" data-step="followup">
+      <div class="card">
+        <div class="card__header">
+          <p class="card__eyebrow">Step 4 of 4 — Clarifying questions</p>
+          <h1 class="card__title">A few more details</h1>
+          <p class="card__description">
+            These short questions will help us create a much more useful support ticket.
+          </p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="followup-loading" class="loading-message">
+          <div class="spinner"></div>
+          <span>Preparing questions…</span>
+        </div>
+
+        <!-- Questions (hidden until loaded) -->
+        <div id="followup-result" class="hidden">
+          <div id="round-badge-container"></div>
+          <form id="form-followup" novalidate>
+            <div class="questions-list" id="questions-list"></div>
+
+            <div class="btn-group btn-group--end mt-6">
+              <button type="submit" class="btn btn--primary btn--lg" id="btn-followup-submit">
+                Submit answers
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 4: Reflection & confirmation
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-reflect" data-step="reflect">
+      <div class="card">
+        <div class="card__header">
+          <p class="card__eyebrow">Confirm your issue</p>
+          <h1 class="card__title">Does this match your situation?</h1>
+          <p class="card__description">
+            Read the summary below and let us know if it accurately describes your issue.
+          </p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="reflect-loading" class="loading-message">
+          <div class="spinner"></div>
+          <span>Summarizing your answers…</span>
+        </div>
+
+        <!-- Reflection result (hidden until loaded) -->
+        <div id="reflect-result" class="hidden">
+          <div class="reflection-card" id="reflection-summary">
+            <p class="reflection-card__heading">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+              Our current understanding
+            </p>
+            <p class="reflection-card__body" id="reflection-text"></p>
+          </div>
+
+          <p class="text-sm text-muted" id="round-counter-text"></p>
+
+          <div class="btn-group btn-group--between mt-4">
+            <button type="button" class="btn btn--secondary" id="btn-reflect-no">
+              Not quite — let me clarify
+            </button>
+            <button type="button" class="btn btn--primary btn--lg" id="btn-reflect-yes">
+              Yes, that's right — generate ticket
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 5: Generating ticket (loading)
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-generating" data-step="generating">
+      <div class="card">
+        <div class="loading-message" style="justify-content: center; padding: var(--space-12) var(--space-6);">
+          <div class="spinner" style="width:32px; height:32px; border-width:3px;"></div>
+          <span style="font-size: var(--text-base);">Generating your support ticket…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP 6: Done / confirmation card
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-done" data-step="done">
+      <div class="card">
+        <div class="confirmation-card">
+          <div class="confirmation-card__icon" aria-hidden="true">✅</div>
+          <h1 class="confirmation-card__title">Ticket created successfully</h1>
+          <p class="confirmation-card__subtitle">
+            Ticket ID: <span class="confirmation-card__ticket-id" id="done-ticket-id"></span>
+          </p>
+          <div class="confirmation-card__email-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            A summary of this ticket has been sent to <strong id="done-email"></strong>
+          </div>
+          <div class="confirmation-actions">
+            <button type="button" class="btn btn--secondary" id="btn-view-ticket">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+              </svg>
+              View ticket
+            </button>
+            <button type="button" class="btn btn--secondary" id="btn-view-payload">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+              View API payload
+            </button>
+            <button type="button" class="btn btn--primary" id="btn-download-pdf">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download PDF
+            </button>
+          </div>
+          <div class="mt-6">
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-start-over">
+              Submit another request
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────────
+         STEP: Graceful exit (max rounds reached)
+    ─────────────────────────────────────────────── -->
+    <div class="step" id="step-exit" data-step="exit">
+      <div class="card">
+        <div class="exit-card">
+          <div class="exit-card__icon" aria-hidden="true">💬</div>
+          <h1 class="exit-card__title">Let's try a different approach</h1>
+          <p class="exit-card__message">
+            We weren't able to get a clear enough picture of your issue after a few rounds of questions. This sometimes happens with complex or multi-part problems.
+            <br /><br />
+            Please restart and try describing your issue in a bit more detail — even one or two more sentences can make a big difference.
+          </p>
+          <button type="button" class="btn btn--primary btn--lg" id="btn-exit-restart">
+            Start a new request
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /.app-main -->
+
+  <!-- jsPDF — loaded from CDN, runs entirely in browser, no server changes needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script type="module" src="/js/api.js"></script>
+  <script type="module" src="/js/ui.js"></script>
+  <script type="module" src="/js/pdf.js"></script>
+  <script type="module" src="/js/app.js"></script>
+
+</body>
+</html>

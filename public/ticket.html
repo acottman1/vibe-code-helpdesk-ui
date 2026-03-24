@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Support Ticket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/output.css" />
+</head>
+<body class="ticket-page">
+
+  <div class="ticket-wrapper">
+
+    <div class="ticket-document" id="ticket-document">
+
+      <!-- Populated by ticket.js -->
+      <div id="ticket-loading" class="loading-message" style="padding: var(--space-12) var(--space-8);">
+        <div class="spinner"></div>
+        <span>Loading ticket…</span>
+      </div>
+
+      <div id="ticket-content" class="hidden"></div>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="/js/ticket.js"></script>
+</body>
+</html>
