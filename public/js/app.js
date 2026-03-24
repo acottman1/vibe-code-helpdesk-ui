@@ -15,7 +15,7 @@ const MAX_ROUNDS = 3;
 // USE_MOCKS — set to true for Phase 2 (no API key required).
 // Phase 3: flip this to false and wire in real OpenAI routes.
 // ---------------------------------------------------------------------------
-const USE_MOCKS = true;
+const USE_MOCKS = false;
 
 // ---------------------------------------------------------------------------
 // Application state
