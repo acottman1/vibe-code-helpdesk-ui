@@ -136,6 +136,14 @@ export function resetLoadingState(step) {
 }
 
 /**
+ * Remove all inline error messages from the page.
+ * Called on every step transition so errors don't bleed across steps.
+ */
+export function clearErrors() {
+  document.querySelectorAll('.inline-error').forEach(el => el.remove());
+}
+
+/**
  * Show an inline error message near a button or form.
  * @param {string} containerId — element to append error to
  * @param {string} message

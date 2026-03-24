@@ -2,13 +2,20 @@
 // Imports api.js, ui.js, pdf.js. Owns all application state.
 
 import { fetchUserContext, classifyIssue, fetchQuestions, fetchReflection, generateTicket } from './api.js';
-import { showStep, renderClassification, renderQuestions, collectAnswers, renderReflection, resetLoadingState, showError } from './ui.js';
+import { showStep, renderClassification, renderQuestions, collectAnswers, renderReflection, resetLoadingState, showError, clearErrors } from './ui.js';
 import { downloadTicketPDF } from './pdf.js';
+import { mockDelay, mockClassify, mockQuestions, mockReflect, mockGenerateTicket } from './mock.js';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 const MAX_ROUNDS = 3;
+
+// ---------------------------------------------------------------------------
+// USE_MOCKS — set to true for Phase 2 (no API key required).
+// Phase 3: flip this to false and wire in real OpenAI routes.
+// ---------------------------------------------------------------------------
+const USE_MOCKS = true;
 
 // ---------------------------------------------------------------------------
 // Application state
@@ -109,6 +116,7 @@ function wireEventListeners() {
     state.affected_device = getInputValue('input-device').trim() || state.affected_device;
     state.user_location   = getInputValue('input-location').trim();
 
+    clearErrors();
     showStep('issue');
   });
 
@@ -130,6 +138,7 @@ function wireEventListeners() {
     state.raw_description                  = description;
     state.requester_priority_self_reported = urgency;
 
+    clearErrors();
     showStep('classify');
     resetLoadingState('classify');
     await runClassification();
@@ -137,11 +146,13 @@ function wireEventListeners() {
 
   // ── Step 1 — back button ─────────────────────────────────────────────────
   document.getElementById('btn-issue-back').addEventListener('click', () => {
+    clearErrors();
     showStep('identity');
   });
 
   // ── Step 2 — confirm classification ─────────────────────────────────────
   document.getElementById('btn-classify-confirm').addEventListener('click', async () => {
+    clearErrors();
     showStep('followup');
     resetLoadingState('followup');
     await runFollowUp();
@@ -149,6 +160,7 @@ function wireEventListeners() {
 
   // ── Step 2 — back ────────────────────────────────────────────────────────
   document.getElementById('btn-classify-back').addEventListener('click', () => {
+    clearErrors();
     showStep('issue');
   });
 
@@ -217,13 +229,21 @@ function wireEventListeners() {
 }
 
 // ---------------------------------------------------------------------------
-// Step runners — these will call the API in Phase 3.
-// For Phase 1 they are stubs that show what will happen.
+// Step runners
+// USE_MOCKS = true  → use mock.js (Phase 2, no API key needed)
+// USE_MOCKS = false → use real OpenAI API calls via api.js (Phase 3)
 // ---------------------------------------------------------------------------
 
 async function runClassification() {
   try {
-    const result = await classifyIssue(state.raw_description);
+    let result;
+    if (USE_MOCKS) {
+      await mockDelay();
+      result = mockClassify(state.raw_description);
+    } else {
+      result = await classifyIssue(state.raw_description);
+    }
+
     state.category           = result.category;
     state.subcategory        = result.subcategory;
     state.priority           = result.llmPriority;
@@ -239,14 +259,20 @@ async function runFollowUp() {
   try {
     state.intake_round_count += 1;
 
-    const result = await fetchQuestions({
-      category:     state.category,
-      description:  state.raw_description,
-      round:        state.intake_round_count,
-      priorAnswers: state.follow_up_rounds.flatMap(r => r.answers),
-    });
+    let result;
+    if (USE_MOCKS) {
+      await mockDelay();
+      result = mockQuestions(state.category, state.intake_round_count);
+    } else {
+      result = await fetchQuestions({
+        category:     state.category,
+        description:  state.raw_description,
+        round:        state.intake_round_count,
+        priorAnswers: state.follow_up_rounds.flatMap(r => r.answers),
+      });
+    }
 
-    // Record this round (answers will be filled in on submit)
+    // Record this round (answers filled in on submit)
     state.follow_up_rounds.push({
       round:     state.intake_round_count,
       questions: result.questions,
@@ -261,11 +287,17 @@ async function runFollowUp() {
 
 async function runReflection() {
   try {
-    const result = await fetchReflection({
-      category:    state.category,
-      description: state.raw_description,
-      rounds:      state.follow_up_rounds,
-    });
+    let result;
+    if (USE_MOCKS) {
+      await mockDelay();
+      result = mockReflect(state.category, state.raw_description, state.follow_up_rounds);
+    } else {
+      result = await fetchReflection({
+        category:    state.category,
+        description: state.raw_description,
+        rounds:      state.follow_up_rounds,
+      });
+    }
 
     renderReflection(result.summary, state.intake_round_count, MAX_ROUNDS);
   } catch (err) {
@@ -275,7 +307,14 @@ async function runReflection() {
 
 async function runGenerateTicket() {
   try {
-    const ticket = await generateTicket(buildIntakePayload());
+    let ticket;
+    if (USE_MOCKS) {
+      await mockDelay(1200);
+      ticket = mockGenerateTicket(buildIntakePayload());
+    } else {
+      ticket = await generateTicket(buildIntakePayload());
+    }
+
     state.ticket = ticket;
 
     // Store in localStorage so output tabs can read it
@@ -287,7 +326,6 @@ async function runGenerateTicket() {
 
     showStep('done');
   } catch (err) {
-    // Fall back to issue step with error
     showStep('issue');
     showError('form-issue', `Ticket generation failed: ${err.message}. Please try again.`);
   }
