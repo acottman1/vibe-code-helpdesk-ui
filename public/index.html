@@ -442,15 +442,18 @@
       <div class="card">
         <div class="exit-card">
           <div class="exit-card__icon" aria-hidden="true">💬</div>
-          <h1 class="exit-card__title">Let's try a different approach</h1>
+          <h1 class="exit-card__title">We've reached the question limit</h1>
           <p class="exit-card__message">
-            We weren't able to get a clear enough picture of your issue after a few rounds of questions. This sometimes happens with complex or multi-part problems.
-            <br /><br />
-            Please restart and try describing your issue in a bit more detail — even one or two more sentences can make a big difference.
+            We've collected as much information as we can in this session. You can submit a ticket now with what we have, or start fresh with a more detailed description.
           </p>
-          <button type="button" class="btn btn--primary btn--lg" id="btn-exit-restart">
-            Start a new request
-          </button>
+          <div class="confirmation-actions">
+            <button type="button" class="btn btn--primary btn--lg" id="btn-exit-submit">
+              Submit ticket as&#8209;is
+            </button>
+            <button type="button" class="btn btn--secondary" id="btn-exit-restart">
+              Start a new request
+            </button>
+          </div>
         </div>
       </div>
     </div>

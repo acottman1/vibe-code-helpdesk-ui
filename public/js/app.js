@@ -247,6 +247,12 @@ function wireEventListeners() {
     showStep('identity');
   });
 
+  // ── Graceful exit — submit with what we have ────────────────────────────
+  document.getElementById('btn-exit-submit').addEventListener('click', async () => {
+    showStep('generating');
+    await runGenerateTicket();
+  });
+
   // ── Graceful exit — restart ──────────────────────────────────────────────
   document.getElementById('btn-exit-restart').addEventListener('click', () => {
     resetState();

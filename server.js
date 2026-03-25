@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // which is required for response_format: json_object to work.
 // temperature: 0.3 keeps output consistent and focused.
 // ---------------------------------------------------------------------------
-async function callOpenAI(messages) {
+async function callOpenAI(messages, temperature = 0.5) {
   if (!openai) {
     throw new Error('OPENAI_API_KEY is not set. Add it to your .env file and restart the server.');
   }
@@ -46,7 +46,7 @@ async function callOpenAI(messages) {
     model:           MODEL,
     messages,
     response_format: { type: 'json_object' },
-    temperature:     0.3,
+    temperature,
   });
 
   const raw = completion.choices[0]?.message?.content;
@@ -137,7 +137,7 @@ app.post('/api/questions', async (req, res) => {
       round:        round    || 1,
       priorAnswers: priorAnswers || [],
     });
-    const result = await callOpenAI(messages);
+    const result = await callOpenAI(messages, 0.4);
 
     // Validate: must be an array, clamp to 3–5 items
     if (!Array.isArray(result.questions) || result.questions.length === 0) {
@@ -177,7 +177,7 @@ app.post('/api/reflect', async (req, res) => {
       description,
       rounds: rounds || [],
     });
-    const result = await callOpenAI(messages);
+    const result = await callOpenAI(messages, 0.7);
 
     if (!result.summary || typeof result.summary !== 'string') {
       throw new Error('Model did not return a valid summary string.');
