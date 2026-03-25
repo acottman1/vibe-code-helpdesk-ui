@@ -6,10 +6,13 @@
    Design Tokens
    -------------------------------------------------------------------------- */
 :root {
-  /* Brand colors */
-  --color-primary:       #2563eb;   /* blue-600 */
-  --color-primary-dark:  #1d4ed8;   /* blue-700 */
-  --color-primary-light: #eff6ff;   /* blue-50  */
+  /* Brand colors — Virginia Tech */
+  --color-primary:       #861F41;   /* VT Chicago Maroon */
+  --color-primary-dark:  #6B1834;   /* VT Maroon dark */
+  --color-primary-light: #F7ECF0;   /* VT Maroon tint */
+  --color-accent:        #E5751F;   /* VT Burnt Orange */
+  --color-accent-dark:   #C4611A;   /* VT Orange dark */
+  --color-accent-light:  #FEF3E8;   /* VT Orange tint */
 
   /* Semantic colors */
   --color-success:       #16a34a;   /* green-600 */
@@ -125,22 +128,22 @@ body {
    App Shell
    -------------------------------------------------------------------------- */
 .app-header {
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-primary);
+  border-bottom: 3px solid var(--color-accent);
+  padding: var(--space-3) var(--space-6);
   display: flex;
   align-items: center;
   gap: var(--space-3);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .app-header__logo {
-  width: 32px;
-  height: 32px;
-  background-color: var(--color-primary);
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-accent);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -149,8 +152,8 @@ body {
 }
 
 .app-header__logo svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   color: white;
   fill: none;
   stroke: currentColor;
@@ -159,16 +162,43 @@ body {
   stroke-linejoin: round;
 }
 
+.app-header__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
 .app-header__title {
   font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
+  font-weight: var(--font-bold);
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.app-header__tagline {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+  font-style: italic;
+}
+
+.app-header__right {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.app-header__phone {
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  font-weight: var(--font-medium);
 }
 
 .app-header__subtitle {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin-left: auto;
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .app-main {
@@ -267,7 +297,7 @@ body {
 .form-input:focus,
 .form-textarea:focus {
   border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  box-shadow: 0 0 0 3px rgb(134 31 65 / 0.15);
 }
 
 .form-input::placeholder,

@@ -13,7 +13,6 @@ export async function fetchUserContext() {
 
 /**
  * Classify a raw issue description into one of 6 categories.
- * Phase 3: wired to OpenAI. For now returns 501.
  * @param {string} description
  * @returns {{ category, categoryLabel, subcategory, llmPriority, priorityRationale }}
  */

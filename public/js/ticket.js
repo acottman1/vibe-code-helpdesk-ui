@@ -37,11 +37,14 @@ function render(t) {
   const html = `
     <div class="ticket-document__header">
       <div class="ticket-document__header-left">
-        <p class="ticket-document__org">IT Help Desk — Support Request</p>
+        <p class="ticket-document__org">Hokie Hackers — IT Help Desk</p>
         <h1 class="ticket-document__title">${esc(t.issue_summary || 'Support Request')}</h1>
         <p class="ticket-document__id">${esc(t.ticket_id || '')} &nbsp;·&nbsp; ${formatTs(t.timestamp)}</p>
       </div>
-      <span class="ticket-document__status-badge">New · Pending Assignment</span>
+      <div class="ticket-document__header-right">
+        <span class="ticket-document__status-badge">New · Pending Assignment</span>
+        <span class="priority-pill ticket-document__header-priority ${priorityClass}">${esc(t.priority || '—')}</span>
+      </div>
     </div>
 
     <div class="ticket-document__body">
@@ -80,6 +83,10 @@ function render(t) {
           <div class="ticket-field">
             <span class="ticket-field__label">Subcategory</span>
             <span class="ticket-field__value">${esc(t.subcategory || '—')}</span>
+          </div>
+          <div class="ticket-field">
+            <span class="ticket-field__label">Issue Started</span>
+            <span class="ticket-field__value">${esc(t.issue_started_at || '—')}</span>
           </div>
           <div class="ticket-field">
             <span class="ticket-field__label">Affected Service</span>

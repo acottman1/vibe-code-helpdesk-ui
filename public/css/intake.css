@@ -69,7 +69,7 @@
 .urgency-option input:checked + .urgency-option__label {
   border-color: var(--color-primary);
   background-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+  box-shadow: 0 0 0 3px rgb(134 31 65 / 0.12);
 }
 
 .urgency-option__label:hover {
@@ -239,7 +239,7 @@
    -------------------------------------------------------------------------- */
 .reflection-card {
   background-color: var(--color-primary-light);
-  border: 1.5px solid rgb(37 99 235 / 0.2);
+  border: 1.5px solid rgb(134 31 65 / 0.2);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   margin-bottom: var(--space-6);
@@ -351,4 +351,166 @@
   justify-content: center;
   flex-wrap: wrap;
   margin-top: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   PDF transcript toggle
+   -------------------------------------------------------------------------- */
+.transcript-toggle {
+  margin-top: var(--space-4);
+  display: flex;
+  justify-content: center;
+}
+
+.transcript-toggle__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.transcript-toggle__label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Category change modal
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: var(--color-bg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 440px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.modal__title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.modal__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  padding: var(--space-1) var(--space-2);
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.modal__close:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-gray-100);
+}
+
+.modal__search {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.modal__list {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--space-2);
+}
+
+.modal__footer {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.category-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border: 1.5px solid transparent;
+}
+
+.category-option:hover {
+  background-color: var(--color-primary-light);
+}
+
+.category-option.is-selected {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.category-option__icon {
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+}
+
+.category-option__name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.category-option__check {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-bold);
+}
+
+.modal-no-results {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }

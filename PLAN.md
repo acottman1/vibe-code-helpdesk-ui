@@ -126,6 +126,7 @@ browser
 
   // Issue
   raw_description: String,               // exactly what the user typed
+  issue_started_at: String,             // user-provided onset ("this morning", "last Tuesday")
   category: String,                      // one of 6 canonical keys
   subcategory: String,                   // LLM-inferred (e.g. "VPN access")
 
@@ -261,7 +262,7 @@ project-root/
 - `intake.css` polish
 - **Test:** Walk through full flow using mocked data, no API calls
 
-### Phase 3 — LLM Integration 🔲
+### Phase 3 — LLM Integration ✅ COMPLETE
 **Objective:** Replace mocked responses with real OpenAI API calls.
 - `server.js`: add `/api/classify`, `/api/questions`, `/api/reflect`, `/api/generate-ticket`
 - `prompts/` files: controlled prompts with JSON output requirements
@@ -270,7 +271,7 @@ project-root/
 - Loading states and error handling
 - **Test:** Full live flow from vague input to reflection confirmation
 
-### Phase 4 — Output Artifacts 🔲
+### Phase 4 — Output Artifacts ✅ COMPLETE
 **Objective:** Generate all three output artifacts.
 - `ticket.html` + `ticket.js`: read localStorage, render structured ticket
 - `payload.html` + `payload.js`: read localStorage, render pretty JSON
@@ -278,15 +279,20 @@ project-root/
 - `pdf.js`: jsPDF summary card, optional transcript toggle
 - **Test:** Complete intake → verify all three outputs, download PDF
 
-### Phase 5 — Polish & Edge Cases 🔲
-**Objective:** Demo-ready.
-- Graceful exit flow when max rounds reached
-- Category confirmation / override step
-- `output.css` for ticket and payload tabs
-- Responsive layout check
-- Error states (API failure, empty answers, malformed LLM response)
-- README with setup instructions
-- **Test:** Walk all edge case paths
+### Phase 5 — Polish & Branding ✅ COMPLETE
+**Objective:** Demo-ready with VT branding and UX polish.
+- Virginia Tech color scheme (Chicago Maroon + Burnt Orange) across all surfaces
+- "Hokie Hackers" company branding with tagline and phone number
+- Category override as 2-step modal with live search filtering and "Other" option
+- "When did this start?" text field on the issue entry step
+- PDF transcript toggle checkbox on the done screen
+- ServiceNow-style ticket header with burnt orange accent strip and priority pill
+- Fix redundant script tags in index.html
+- Fix stale comment in api.js
+- Set confirmation_status = 'max_rounds_reached' on exit path
+- Soft validation for empty follow-up answers
+- `issue_started_at` field propagated through data model, ticket view, PDF, and prompt
+- **Test:** Walk all edge case paths; verify branding on all surfaces
 
 ---
 
@@ -387,6 +393,9 @@ Do not build:
 | 2026-03-24 | Phase 1 | Completed — merged PR #1 to main |
 | 2026-03-24 | Phase 2 | Started implementation |
 | 2026-03-24 | Phase 2 | Completed — merged PR #2 to main |
+| 2026-03-25 | Phase 3 | Completed — merged PR #3 to main |
+| 2026-03-25 | Phase 4 | Completed — output artifacts validated (ticket, payload, PDF) |
+| 2026-03-25 | Phase 5 | Completed — VT branding, category modal, issue_started_at, ServiceNow ticket header |
 
 ---
 
@@ -516,3 +525,89 @@ In short: `mock.js` contains questions that ARE shown to the user in Phase 2. `p
 - Confirm path → generating spinner shows ~1200ms, done card renders with ticket ID
 - Done screen → ticket tab opens with full structured view, payload tab opens with highlighted JSON, PDF downloads
 - Start over → state resets completely, identity form re-shows with pre-filled values intact
+
+---
+
+## Phase 3 Completion Summary
+
+**Branch:** `phase-3-llm-integration`
+**PR:** #3 — merged to `main` on 2026-03-25
+
+### What was built
+
+#### `server.js` (updated)
+- Shared `callOpenAI(messages, model)` helper centralizes all OpenAI HTTP calls — one place to adjust timeout, model, or headers
+- `/api/classify` — POST, calls GPT-4o-mini with classify prompt, returns `{ category, subcategory, llmPriority, priorityRationale }`
+- `/api/questions` — POST, calls GPT-4o-mini with questions prompt, returns `{ questions: string[] }`
+- `/api/reflect` — POST, calls GPT-4o-mini with reflect prompt, returns `{ summary: string }`
+- `/api/generate-ticket` — POST, calls GPT-4o-mini with generate-ticket prompt, returns full ticket JSON
+- All routes validate required fields and return 400 on missing input
+- All routes validate LLM response structure and return 500 if output is malformed
+- `response_format: { type: 'json_object' }` used for all structured-output calls
+
+#### `public/js/app.js` (updated)
+- `USE_MOCKS` flipped to `false` — all four step runners now call real OpenAI routes
+
+### Root cause of initial API failure
+`OPENAI_API_KEY` was set as a Windows system environment variable (pointing to a stale/different key). `dotenv` does not override existing process environment variables — the stale value was winning. Fix: deleted the system environment variable via Windows Environment Variables dialog, opened a fresh terminal.
+
+### Verified working
+- Full live flow: vague description → classification → 3 follow-up questions → reflection → ticket generation
+- All four routes return valid JSON from OpenAI
+- Loading spinners and error handling work identically to mock mode
+
+---
+
+## Phase 4 Completion Summary
+
+**Branch:** `phase-3-llm-integration` (output artifacts included in same branch)
+**Verified:** 2026-03-25
+
+### What was validated
+- `ticket.html` opens in new tab, reads localStorage, renders full structured ticket with all fields and Q&A transcript
+- `payload.html` opens in new tab, reads localStorage, renders syntax-highlighted JSON with copy button
+- Main page done card shows ticket ID and simulated email notice
+- PDF download generates letter-format summary card with all ticket fields
+- Optional transcript checkbox on done screen controls whether Q&A is appended to PDF
+- All three outputs contain real data from the live LLM-generated ticket
+
+---
+
+## Phase 5 Completion Summary
+
+**Branch:** `phase-3-llm-integration` (polish applied before final merge)
+
+### What was built
+
+#### VT Branding (`main.css`, `intake.css`, `index.html`, `pdf.js`, `output.css`)
+- Primary color token changed to VT Chicago Maroon (`#861F41`), accent token added for Burnt Orange (`#E5751F`)
+- All blue hardcoded values in `intake.css` replaced with maroon equivalents
+- App header rebuilt with Hokie Hackers brand structure: company name, tagline ("Enterprise quality vibe coding at scale for critical systems deployment."), and phone number (540) 555-4653
+- PDF header band changed to VT Maroon with a 4pt Burnt Orange accent strip
+- Ticket view header updated with 4px Burnt Orange bottom border
+
+#### Category Override Modal (`ui.js`, `app.js`, `intake.css`)
+- "Change" button opens a full-screen modal dialog with search input and scrollable category list
+- Active filtering: typing in the search box instantly filters visible options
+- "Other" option silently preserves the LLM-inferred category in state for routing; only the badge display changes
+- Event delegation: `#classify-result` listens for `#btn-change-category` clicks so the listener survives badge re-renders
+- Modal closes on: X button, Cancel button, Escape key, clicking the overlay
+
+#### "When did this start?" field (`index.html`, `app.js`, `pdf.js`, `ticket.js`, `prompts/generate-ticket.js`)
+- Optional text input on Step 1 (issue entry)
+- Value stored in `state.issue_started_at`, passed through `buildIntakePayload`
+- Included in generate-ticket prompt context and output schema
+- Rendered in ticket view (Classification section) and PDF (Issue Details section)
+
+#### ServiceNow-style ticket header (`ticket.js`, `output.css`)
+- Header right side now shows both status badge and priority pill
+- Priority pill styled with white-on-maroon semi-transparent treatment
+- Burnt orange bottom border on header separates header band from body
+
+#### Other fixes
+- Removed 3 redundant `<script type="module">` tags from `index.html` (api.js, ui.js, pdf.js are imported by app.js)
+- Removed stale "Phase 3: wired to OpenAI. For now returns 501." comment from `api.js`
+- `state.confirmation_status = 'max_rounds_reached'` now set before `showStep('exit')` on the no-more-rounds path
+- Soft validation on follow-up form: if all answers are blank, shows a tip but blocks submission; one answered question is sufficient
+- PDF transcript toggle reads `#pdf-include-transcript` checkbox; ticket and payload tabs always include full transcript
+- `issue_started_at` and `original_llm_category` added to `resetState()`
