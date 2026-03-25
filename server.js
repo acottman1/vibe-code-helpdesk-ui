@@ -223,7 +223,7 @@ app.post('/api/generate-ticket', async (req, res) => {
 
       // Always use real intake data for these — never trust the model
       ticket_id:                         result.ticket_id || 'INC-' + String(Math.floor(100000 + Math.random() * 900000)),
-      timestamp:                         result.timestamp  || new Date().toISOString(),
+      timestamp:                         new Date().toISOString(),
       requester_name:                    intakeData.requester_name,
       requester_email:                   intakeData.requester_email,
       category:                          intakeData.category,
