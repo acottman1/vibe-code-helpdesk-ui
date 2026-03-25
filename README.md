@@ -188,10 +188,10 @@ All LLM calls go: Browser → your local Express server → OpenAI. The browser 
 | Phase | Status | Description |
 |---|---|---|
 | 1 — Skeleton & Server | ✅ Complete | Server, HTML shell, CSS design system, identity pre-fill |
-| 2 — Intake UI & State Machine | 🔲 Upcoming | Full flow with mocked responses |
-| 3 — LLM Integration | 🔲 Upcoming | Real OpenAI API calls |
-| 4 — Output Artifacts | 🔲 Upcoming | Ticket tab, payload tab, PDF |
-| 5 — Polish & Edge Cases | 🔲 Upcoming | Error states, graceful exit, responsive layout |
+| 2 — Intake UI & State Machine | ✅ Complete | Full flow with mocked responses |
+| 3 — LLM Integration | ✅ Complete | Real OpenAI API calls |
+| 4 — Output Artifacts | ✅ Complete | Ticket tab, payload tab, PDF |
+| 5 — Polish & Edge Cases | ✅ Complete | Error states, graceful exit, branding |
 
 ---
 
