@@ -396,6 +396,7 @@ Do not build:
 | 2026-03-25 | Phase 3 | Completed — merged PR #3 to main |
 | 2026-03-25 | Phase 4 | Completed — output artifacts validated (ticket, payload, PDF) |
 | 2026-03-25 | Phase 5 | Completed — VT branding, category modal, issue_started_at, ServiceNow ticket header |
+| 2026-03-25 | Post-5 fixes | Reflection prompt uses all Q&A rounds; exit step adds submit-as-is; ticket timestamp uses real server time |
 
 ---
 
@@ -611,3 +612,21 @@ In short: `mock.js` contains questions that ARE shown to the user in Phase 2. `p
 - Soft validation on follow-up form: if all answers are blank, shows a tip but blocks submission; one answered question is sufficient
 - PDF transcript toggle reads `#pdf-include-transcript` checkbox; ticket and payload tabs always include full transcript
 - `issue_started_at` and `original_llm_category` added to `resetState()`
+
+---
+
+## Post-Phase-5 Fixes
+
+### Reflection quality (`prompts/reflect.js`, `server.js`)
+- Q&A context is now grouped and labeled by round ("Round 1:", "Round 2:") so the model synthesizes all rounds equally rather than defaulting to the most recent
+- Blank answers are filtered from context to reduce noise
+- Removed the "2–4 sentences maximum" cap — summary length now scales proportionally with how much information was collected
+- `callOpenAI` default temperature raised from 0.3 → 0.5; reflection runs at 0.7 for natural varied prose; question generation runs at 0.4 for consistent structured output; classification remains at default
+
+### Exit step UX (`public/index.html`, `public/js/app.js`)
+- Max-rounds exit screen now offers two choices:
+  - **Submit ticket as-is** — proceeds to ticket generation using all collected information, `confirmation_status = max_rounds_reached`
+  - **Start a new request** — resets state and returns to identity step (previous behavior)
+
+### Ticket timestamp (`server.js`)
+- Timestamp is now always set to `new Date().toISOString()` at the moment of server-side ticket generation. Previously the server trusted the LLM's fabricated timestamp and only fell back to real time if the model omitted the field.
