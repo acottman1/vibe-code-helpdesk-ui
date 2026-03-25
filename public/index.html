@@ -17,15 +17,20 @@
   ======================================================= -->
   <header class="app-header">
     <div class="app-header__logo" aria-hidden="true">
-      <!-- Headset / support icon -->
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/>
         <path d="M3 12h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H3v-6z"/>
         <path d="M21 12h-1a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1v-6z"/>
       </svg>
     </div>
-    <span class="app-header__title">IT Help Desk</span>
-    <span class="app-header__subtitle" id="header-username"></span>
+    <div class="app-header__brand">
+      <span class="app-header__title">Hokie Hackers</span>
+      <span class="app-header__tagline">Enterprise quality vibe coding at scale for critical systems deployment.</span>
+    </div>
+    <div class="app-header__right">
+      <span class="app-header__phone">IT Help Desk: (540) 555-4653</span>
+      <span class="app-header__subtitle" id="header-username"></span>
+    </div>
   </header>
 
   <!-- ======================================================
@@ -190,6 +195,20 @@
               </div>
 
             </div>
+          </div>
+
+          <div class="form-group mt-6">
+            <label class="form-label" for="input-issue-started">
+              When did this start?
+            </label>
+            <input
+              class="form-input"
+              type="text"
+              id="input-issue-started"
+              name="issue_started"
+              placeholder="e.g. this morning, since yesterday, about an hour ago"
+            />
+            <p class="form-hint">Helps the support team understand the timeline.</p>
           </div>
 
           <div class="btn-group btn-group--between">
@@ -376,6 +395,13 @@
             </svg>
             A summary of this ticket has been sent to <strong id="done-email"></strong>
           </div>
+          <div class="transcript-toggle">
+            <label class="transcript-toggle__label">
+              <input type="checkbox" id="pdf-include-transcript" />
+              Include Q&amp;A transcript in PDF
+            </label>
+          </div>
+
           <div class="confirmation-actions">
             <button type="button" class="btn btn--secondary" id="btn-view-ticket">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -433,10 +459,6 @@
 
   <!-- jsPDF — loaded from CDN, runs entirely in browser, no server changes needed -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <script type="module" src="/js/api.js"></script>
-  <script type="module" src="/js/ui.js"></script>
-  <script type="module" src="/js/pdf.js"></script>
   <script type="module" src="/js/app.js"></script>
 
 </body>

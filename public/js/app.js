@@ -2,7 +2,7 @@
 // Imports api.js, ui.js, pdf.js. Owns all application state.
 
 import { fetchUserContext, classifyIssue, fetchQuestions, fetchReflection, generateTicket } from './api.js';
-import { showStep, renderClassification, renderQuestions, collectAnswers, renderReflection, resetLoadingState, showError, clearErrors } from './ui.js';
+import { showStep, renderClassification, renderCategoryBadge, openCategoryModal, renderQuestions, collectAnswers, renderReflection, resetLoadingState, showError, clearErrors } from './ui.js';
 import { downloadTicketPDF } from './pdf.js';
 import { mockDelay, mockClassify, mockQuestions, mockReflect, mockGenerateTicket } from './mock.js';
 
@@ -33,12 +33,14 @@ const state = {
   // Issue (Step 1)
   raw_description:                   '',
   requester_priority_self_reported:  '',
+  issue_started_at:                  '',
 
   // Classification (Step 2)
-  category:           '',
-  subcategory:        '',
-  priority:           '',          // LLM assessment
-  priority_rationale: '',
+  category:                '',
+  subcategory:             '',
+  priority:                '',   // LLM assessment
+  priority_rationale:      '',
+  original_llm_category:   '',   // preserved so 'Other' override still routes correctly
 
   // Follow-up rounds (Steps 3–4)
   follow_up_rounds:   [],          // [{ round, questions, answers }]
@@ -137,6 +139,7 @@ function wireEventListeners() {
 
     state.raw_description                  = description;
     state.requester_priority_self_reported = urgency;
+    state.issue_started_at                 = getInputValue('input-issue-started').trim();
 
     clearErrors();
     showStep('classify');
@@ -148,6 +151,21 @@ function wireEventListeners() {
   document.getElementById('btn-issue-back').addEventListener('click', () => {
     clearErrors();
     showStep('identity');
+  });
+
+  // ── Step 2 — category change (event delegation, button re-renders on each call) ──
+  document.getElementById('classify-result').addEventListener('click', e => {
+    if (!e.target.closest('#btn-change-category')) return;
+    openCategoryModal(state.category, selectedKey => {
+      if (selectedKey === 'other') {
+        // Keep original LLM category for routing; show 'Other' in badge display only
+        renderCategoryBadge(state.original_llm_category, state.subcategory, 'Other');
+      } else {
+        state.category   = selectedKey;
+        state.subcategory = '';
+        renderCategoryBadge(selectedKey, '');
+      }
+    });
   });
 
   // ── Step 2 — confirm classification ─────────────────────────────────────
@@ -168,6 +186,13 @@ function wireEventListeners() {
   document.getElementById('form-followup').addEventListener('submit', async e => {
     e.preventDefault();
     const answers = collectAnswers();
+
+    // Soft-warn if every answer is blank, but don't block submission
+    const allBlank = answers.every(a => !a.answer);
+    if (allBlank) {
+      showError('form-followup', 'Tip: answering at least one question will produce a better ticket.');
+      return;
+    }
 
     // Record this round's answers
     const currentRound = state.follow_up_rounds[state.follow_up_rounds.length - 1];
@@ -190,6 +215,7 @@ function wireEventListeners() {
   // ── Step 4 — user says not quite ────────────────────────────────────────
   document.getElementById('btn-reflect-no').addEventListener('click', async () => {
     if (state.intake_round_count >= MAX_ROUNDS) {
+      state.confirmation_status = 'max_rounds_reached';
       showStep('exit');
       return;
     }
@@ -211,8 +237,8 @@ function wireEventListeners() {
   // ── Step 5 (done) — download PDF ────────────────────────────────────────
   document.getElementById('btn-download-pdf').addEventListener('click', () => {
     if (!state.ticket) return;
-    // Default: no transcript. A toggle can be added in Phase 5.
-    downloadTicketPDF(state.ticket, false);
+    const includeTranscript = document.getElementById('pdf-include-transcript')?.checked ?? false;
+    downloadTicketPDF(state.ticket, includeTranscript);
   });
 
   // ── Step 5 (done) — start over ───────────────────────────────────────────
@@ -244,10 +270,11 @@ async function runClassification() {
       result = await classifyIssue(state.raw_description);
     }
 
-    state.category           = result.category;
-    state.subcategory        = result.subcategory;
-    state.priority           = result.llmPriority;
-    state.priority_rationale = result.priorityRationale;
+    state.category             = result.category;
+    state.original_llm_category = result.category;
+    state.subcategory          = result.subcategory;
+    state.priority             = result.llmPriority;
+    state.priority_rationale   = result.priorityRationale;
 
     renderClassification(result, state.requester_priority_self_reported);
   } catch (err) {
@@ -342,6 +369,7 @@ function buildIntakePayload() {
     requester_username:                state.requester_username,
     requester_domain:                  state.requester_domain,
     raw_description:                   state.raw_description,
+    issue_started_at:                  state.issue_started_at,
     category:                          state.category,
     subcategory:                       state.subcategory,
     priority:                          state.priority,
@@ -362,7 +390,8 @@ function openOutputTab(page) {
 function resetState() {
   Object.assign(state, {
     requester_name: '', requester_email: '', raw_description: '',
-    requester_priority_self_reported: '', category: '', subcategory: '',
+    issue_started_at: '', requester_priority_self_reported: '',
+    category: '', subcategory: '', original_llm_category: '',
     priority: '', priority_rationale: '', follow_up_rounds: [],
     intake_round_count: 0, ticket: null, confirmation_status: '',
   });

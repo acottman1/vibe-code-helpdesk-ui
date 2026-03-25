@@ -48,6 +48,7 @@ Required output format (all fields must be present):
   "priority_rationale": "<string>",
   "requester_priority_self_reported": "<string>",
   "business_impact": "<string>",
+  "issue_started_at": "<string — when user says issue began, or empty string if not provided>",
   "affected_service": "<string>",
   "affected_device": "<string>",
   "user_location": "<string>",
@@ -70,6 +71,7 @@ Device: ${intakeData.affected_device || 'unknown'}
 Location: ${intakeData.user_location || 'unknown'}
 
 Original description: "${intakeData.raw_description}"
+Issue started: ${intakeData.issue_started_at || 'not provided'}
 
 Category: ${intakeData.category}
 Subcategory: ${intakeData.subcategory || 'unknown'}

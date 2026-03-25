@@ -62,15 +62,17 @@ export function downloadTicketPDF(ticket, includeTranscript = false) {
 
   // ── Header band ──────────────────────────────────────────────────────────
 
-  // Blue header rectangle
-  doc.setFillColor(37, 99, 235); // primary blue
+  // VT Maroon header rectangle
+  doc.setFillColor(134, 31, 65); // VT Chicago Maroon
   doc.rect(0, 0, pageW, 72, 'F');
+  // VT Burnt Orange accent strip
+  doc.setFillColor(229, 117, 31);
+  doc.rect(0, 72, pageW, 4, 'F');
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(255, 255, 255);
-  doc.setTextColor(200, 220, 255);
-  doc.text('IT HELP DESK — SUPPORT REQUEST', marginL, 26);
+  doc.setTextColor(255, 200, 170); // warm tint on maroon
+  doc.text('HOKIE HACKERS — IT HELP DESK', marginL, 26);
 
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
@@ -82,7 +84,7 @@ export function downloadTicketPDF(ticket, includeTranscript = false) {
   doc.setTextColor(180, 210, 255);
   doc.text(`${ticket.ticket_id || ''}   ·   ${formatTimestamp(ticket.timestamp)}`, marginL, 62);
 
-  y = 96;
+  y = 100;
 
   // ── Requester ────────────────────────────────────────────────────────────
 
@@ -105,6 +107,7 @@ export function downloadTicketPDF(ticket, includeTranscript = false) {
 
   drawField('Category',    ticket.category ? labelFromCategory(ticket.category) : '');
   drawField('Subcategory', ticket.subcategory);
+  drawField('Issue started', ticket.issue_started_at);
   drawField('Affected Service / System', ticket.affected_service);
   drawField('Who is affected', ticket.single_or_multi_user);
 
