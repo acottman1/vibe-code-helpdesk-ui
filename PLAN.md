@@ -630,3 +630,69 @@ In short: `mock.js` contains questions that ARE shown to the user in Phase 2. `p
 
 ### Ticket timestamp (`server.js`)
 - Timestamp is now always set to `new Date().toISOString()` at the moment of server-side ticket generation. Previously the server trusted the LLM's fabricated timestamp and only fell back to real time if the model omitted the field.
+
+---
+
+## Vibe Notes — Design Decisions and In-Session Thinking
+
+This section captures the reasoning, observations, and instincts behind key decisions made during active development. Written for the project partners to remember what we were thinking at the time.
+
+---
+
+### The API key nightmare (Phase 3 unblocking)
+
+The live API wouldn't connect despite the `.env` file looking correct. Initial suspicion was billing, token permissions, or encoding — none of those were it. The breakthrough was noticing that `dotenv` silently does not override existing environment variables. A stale `OPENAI_API_KEY` had been set as a Windows system environment variable at some earlier point (probably from a tutorial or another project), and it was winning. The `.env` file was being read but ignored for that key. Fix was opening Windows Environment Variables, deleting the system-level key, and opening a fresh terminal.
+
+The tell that something was wrong: the same API key worked fine in another project (FedRAMP RAG). Direct inspection of `process.env.OPENAI_API_KEY` in Node showed a value that didn't match the `.env` file — different suffix. Once that was visible, the cause was obvious.
+
+**The lesson we wanted to remember:** `dotenv` is not authoritative. System env vars always win. If an API key looks right but isn't working, check what the process actually sees, not what the file says.
+
+---
+
+### Branding: why "Hokie Hackers"
+
+The assignment is explicitly a "vibe coding" project. We leaned into that. "Enterprise quality vibe coding at scale for critical systems deployment." is the tagline — intentionally absurd, because the whole point is to build something that *looks* serious while the method is fast and AI-assisted. The VT colors (Chicago Maroon + Burnt Orange) grounded it as a class project without being generic. The phone number (540) 555-4653 is a 555 number so it's obviously fake, but having a phone number made the header look like a real IT department page rather than a demo.
+
+---
+
+### Category override: why "Other" is a silent lie
+
+The user requested that selecting "Other" from the category modal should silently keep the LLM's inferred category for routing purposes — only the display label changes. This felt counterintuitive at first (why let the user override if we ignore it?) but the reasoning was sound: the LLM knows more about IT routing than the user does. If someone doesn't recognize their category, they shouldn't accidentally reroute their ticket to the wrong team. "Other" is a UX escape hatch that says "I don't understand this label" — it's not "I know better than the system." Routing stays correct; the user just gets a friendlier label.
+
+The implementation keeps `state.original_llm_category` separate from `state.category` so the override can be applied to display without affecting the payload.
+
+---
+
+### "When did this start?" — reviewer suggestion we actually used
+
+A code review pass surfaced the suggestion to add an onset field. We included it because in a real IT ticket, "this started after I updated Chrome yesterday" is the single most useful piece of triage information. It immediately separates "something changed on my machine" from "this has always been broken" and changes how a technician would approach it. Keeping it optional meant no friction for users who don't know when it started.
+
+---
+
+### PDF transcript: full context vs. clean summary
+
+The done screen has a checkbox to include or exclude the Q&A transcript from the PDF. The ticket tab and payload tab always include it. The logic: the PDF is often the "leave-behind" artifact — what gets printed and handed to a walk-in technician or attached to a physical work order. For that use case, a clean one-pager without 12 questions and answers is often more useful. The ticket and payload tabs are for the IT system and need the full audit trail. The toggle gives the user control over the printed artifact without affecting the structured data.
+
+---
+
+### ServiceNow styling: screenshots matter
+
+The ask to style the ticket view "closer to a real ServiceNow layout" was explicitly about making demo screenshots look professional. This is a class project and the deliverable includes screen captures. A ticket view that looks like a real enterprise ITSM tool carries weight in a presentation even if nothing actually submits to ServiceNow. The burnt orange bottom border on the ticket header card was a direct carry-over from the PDF header band — we'd already established that visual language in the PDF, so applying it to the ticket view created visual consistency across all three output artifacts.
+
+---
+
+### Reflection summary: noticing the pattern
+
+The observation that summaries were "oddly the same length" was a real UI smell. The prompt was enforcing "2–4 sentences maximum" and the model, running at temperature 0.3, was finding the same local optimum every time: two sentences, roughly 40 words, formulaic structure. The fix was two-pronged — remove the hard cap (let length scale with information collected) and raise the temperature (more varied sentence construction). The Q&A context was also restructured to label rounds explicitly, because the flat concatenation made it easy for the model to weight recent answers more heavily than earlier ones.
+
+---
+
+### Exit step: submit vs. start over
+
+The original exit screen told the user to start over and rephrase their issue. That's occasionally the right call but often condescending — the user may have given perfectly useful information across three rounds and just couldn't confirm the reflection phrasing. Adding "Submit ticket as-is" lets the conversation end productively regardless of whether the LLM's reflection was accurate. The `confirmation_status = max_rounds_reached` field in the ticket payload preserves the context for the technician: they can see that the intake ran long and the user chose to submit without a clean confirmation.
+
+---
+
+### Timestamp: trusting the wrong source
+
+The LLM was generating the ticket timestamp because the prompt schema listed it as a required output field. The model has no idea what time it is — it was presumably using its training data to produce a plausible-looking ISO timestamp, which is why the date was wrong. The fix was obvious once noticed: always overwrite with `new Date().toISOString()` on the server and remove `timestamp` from the list of things we trust the model to produce. This is the same pattern used for all the other identity fields (requester name, email, etc.) — the model generates narrative, the server enforces facts.
